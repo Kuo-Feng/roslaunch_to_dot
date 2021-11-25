@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''This script takes a ROS launch file as input and generates a dot graph
 file based on the tree of nodes and launch files that will be launched
 based on the input launch file.
@@ -234,8 +234,8 @@ class LaunchFile:
                 # Only parse if the file exists
                 self.__parseLaunchFile(filename)
             else:
-                print "WARNING: Could not locate launch " \
-                    "file: %s" % self.__filename
+                print ("WARNING: Could not locate launch " 
+                    "file: %s" % self.__filename)
 
     #### Getter functions
 
@@ -412,7 +412,7 @@ class LaunchFile:
         #### Create a subgraph for every known package
         self.__clusterNum = 0
         allNodeNames = set()  # Set of node names to check for duplicates
-        for packageName, packageItems in packageMap.iteritems():
+        for packageName, packageItems in packageMap.items():
             self.__createPackageSubgraph(
                 graph, packageName, packageItems, allNodeNames)
 
@@ -426,7 +426,7 @@ class LaunchFile:
 
             # Add a single line to the label for the node for each arg
             # name value pair that was specified on the command line
-            for argName, argValue in self.__overrideArgs.iteritems():
+            for argName, argValue in self.__overrideArgs.items():
                 # Create a label each command line argument
                 label = "%s:=%s" % (argName, argValue)
                 claLines.append(label)
@@ -455,7 +455,7 @@ class LaunchFile:
         #### Create connections between all launch files
 
         # Iterate over all packages contained in the launch tree
-        for _, packageItems in packageMap.iteritems():
+        for _, packageItems in packageMap.items():
             # Iterate over all launch files in this package
             for launchFile in packageItems.launchFiles:
                 parentNodeName = launchFile.getDotNodeName()
@@ -506,7 +506,7 @@ class LaunchFile:
                         color=color)
 
         #### Create connections between launch files and nodes
-        for _, packageItems in packageMap.iteritems():
+        for _, packageItems in packageMap.items():
             # Iterate over the nodes in this package
             for node in packageItems.nodes:
                 # Grab the dot node name of the launch file for this node
@@ -542,7 +542,7 @@ class LaunchFile:
         #### Create connections between launch files and rosparam files
         if self.__inputArgs.showRosParamNodes:
             # Iterate over all packages contained in the launch tree
-            for _, packageItems in packageMap.iteritems():
+            for _, packageItems in packageMap.items():
                 # Iterate over all launch files in this package
                 for launchFile in packageItems.launchFiles:
                     launchNodeName = launchFile.getDotNodeName()
@@ -631,8 +631,8 @@ class LaunchFile:
             # ROS nodes must have unique names, thus alert the user if
             # there are two nodes that have the same name
             if node.name in allNodeNames:
-                print "WARNING: There are two nodes in the launch tree " \
-                    "that have the same name: %s" % node.name
+                print ("WARNING: There are two nodes in the launch tree " 
+                    "that have the same name: %s" % node.name)
 
                 # Modify the style of the node if it is a duplicate
                 color = self.DuplicateNodeColor
@@ -707,7 +707,7 @@ class LaunchFile:
         try:
             tree = ET.parse(filename)
             root = tree.getroot()
-        except Exception, e:
+        except Exception as e:
             raise Exception(
                 "Error while parsing launch file: %s: %s" % (filename, e))
 
@@ -791,8 +791,8 @@ class LaunchFile:
             if valueSpecified and name in self.__overrideArgs:
                 del self.__overrideArgs[name]  # Remove it from the override
 
-                print "WARNING: cannot override arg '%s', which has " \
-                    "already been set." % name
+                print ("WARNING: cannot override arg '%s', which has " 
+                    "already been set." % name)
 
     def __parseIncludeTag(self, include):
         '''Parse the include tag from a launch file.
@@ -844,8 +844,8 @@ class LaunchFile:
         # launch file includes a launch file directly in its own ancestor tree
         hasVisited = (resolved in self.__ancestors)
         if hasVisited:
-            print "ERROR: There is a cycle in the launch file " \
-                "graph from: '%s' to '%s'" % (self.__filename, resolved)
+            print( "ERROR: There is a cycle in the launch file " 
+                "graph from: '%s' to '%s'" % (self.__filename, resolved))
             self.__cycles.append(resolved)  # Add the filename
 
         # Iterate over all children of the include tag to determine if we
@@ -938,7 +938,7 @@ class LaunchFile:
                     self.__parseRosParam(child)
                 except:
                     traceback.print_exc()
-                    print "WARNING: parsing rosparam"
+                    print ("WARNING: parsing rosparam")
                     continue  # Ignore error
 
     def __parseRosParam(self, rosparam):
@@ -969,8 +969,8 @@ class LaunchFile:
                 # Determine what ROS package contains the rosparam file
                 package = rospkg.get_package_name(resolved)
                 if package is None:
-                    print "ERROR: Failed to find package for rosparam " \
-                        "file: %s" % resolved
+                    print ("ERROR: Failed to find package for rosparam " 
+                        "file: %s" % resolved)
                     return  # Skip the file
 
                 # Create a unique name for the dot node
@@ -1369,15 +1369,15 @@ if __name__ == '__main__':
             name, value = parts
             overrideArgs[name] = value
         else:
-            print "ERROR: invalid syntax for arg %s: %s" % (index, argStr)
-            print "       Args must be specified as NAME:=VALUE"
+            print(" ERROR: invalid syntax for arg %s: %s" % (index, argStr))
+            print("       Args must be specified as NAME:=VALUE")
             exit(1)
 
     ##### Validate the input arguments
 
     # Make sure the launch file exists
     if not exists(launchFile):
-        print "ERROR: Can not find launch file: %s" % launchFile
+        print("ERROR: Can not find launch file: %s" % launchFile)
         exit(2)
 
     # Make sure the file is actually a launch file
@@ -1385,8 +1385,8 @@ if __name__ == '__main__':
     launchFileBaseName, launchFileExtension = splitext(launchFile.lower())
     if not launchFileExtension in LAUNCH_FILE_TYPES:
         filetypes = ', '.join(LAUNCH_FILE_TYPES)
-        print "ERROR: Must be given a supported filetype: %s: %s" % \
-            (filetypes, launchFile)
+        print ("ERROR: Must be given a supported filetype: %s: %s" % 
+            (filetypes, launchFile))
         exit(3)
 
     ##### Parse the launch file as XML
@@ -1394,7 +1394,7 @@ if __name__ == '__main__':
         launchFile = LaunchFile(args, launchFile, overrideArgs=overrideArgs)
     except:
         traceback.print_exc()
-        print "ERROR: failed to parse launch file: %s" % launchFile
+        print ("ERROR: failed to parse launch file: %s" % launchFile)
         exit(4)
 
     ##### Convert the launch file tree to a dot file
@@ -1402,7 +1402,7 @@ if __name__ == '__main__':
         graph = launchFile.toDot()
     except:
         traceback.print_exc()
-        print "ERROR: failed to generate dot file contents..."
+        print ("ERROR: failed to generate dot file contents...")
         exit(5)
     else:
         ##### Save the dot file
@@ -1410,33 +1410,33 @@ if __name__ == '__main__':
 
         ##### Convert the dot file into a PNG
         if args.convertToPng:
-            print "Converting dot file into PNG..."
+            print ("Converting dot file into PNG...")
 
             # Use the same base name as the dot file for the png
             pngFilename = splitext(dotFilename)[0] + ".png"
 
             # create png
             graph.draw(pngFilename, prog="dot")
-            print "PNG saved to: %s" % pngFilename
+            print ("PNG saved to: %s" % pngFilename)
 
         ##### Convert the dot file into an SVG
         if args.convertToSvg:
-            print "Converting dot file into SVG..."
+            print ("Converting dot file into SVG...")
 
             # Use the same base name as the dot file for the svg
             svgFilename = splitext(dotFilename)[0] + ".svg"
 
             # create png
             graph.draw(svgFilename, prog="dot", format="svg")
-            print "SVG saved to: %s" % svgFilename
+            print ("SVG saved to: %s" % svgFilename)
 
         ##### Convert the dot file into an PDF
         if args.convertToPdf:
-            print "Converting dot file into PDF..."
+            print ("Converting dot file into PDF...")
 
             # Use the same base name as the dot file for the pdf
             pdfFilename = splitext(dotFilename)[0] + ".pdf"
 
             # create png
             graph.draw(pdfFilename, prog="dot", format="pdf")
-            print "PDF saved to: %s" % pdfFilename
+            print ("PDF saved to: %s" % pdfFilename)
